@@ -34,6 +34,7 @@ struct CLIOptions {
     bool listDevices = false;
     bool showDeviceInfo = false;
     bool verbose = false;
+    bool quiet = false;
     bool jsonOutput = false;
     std::string schemaVersion = "1.0";
 
@@ -83,6 +84,9 @@ struct CLIOptions {
     int loopCount = 0; // 0 = infinite loop
     double playbackSpeed = 0.0; // 0.0 = no frame rate control, 1.0 = normal speed
     bool playbackSpeedSpecified = false;
+
+    // Video recording settings
+    std::string recordVideoPath; ///< Output video file path for --record (camera mode only)
 
     // Conversion settings
     std::string convertInput;

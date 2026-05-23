@@ -82,25 +82,19 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // --record without a frame limit will run indefinitely
+    if (!opts.recordVideoPath.empty() && !opts.captureCountSpecified && opts.timeoutSeconds == 0) {
+        std::cerr << "Warning: --record specified without -c/--count or --timeout. "
+                     "Use Ctrl+C to stop recording." << std::endl;
+    }
+
     // Set log level based on options
     if (opts.verbose) {
         ccap::setLogLevel(ccap::LogLevel::Verbose);
+    } else if (opts.quiet) {
+        ccap::setLogLevel(ccap::LogLevel::Error);
     } else {
-        // Check if -q/--quiet was specified by looking at argv
-        bool quietMode = false;
-        for (int i = 1; i < argc; ++i) {
-            std::string arg = argv[i];
-            if (arg == "-q" || arg == "--quiet") {
-                quietMode = true;
-                break;
-            }
-        }
-        
-        if (quietMode) {
-            ccap::setLogLevel(ccap::LogLevel::Error);
-        } else {
-            ccap::setLogLevel(ccap::LogLevel::Info);
-        }
+        ccap::setLogLevel(ccap::LogLevel::Info);
     }
 
     // Set error callback
@@ -125,7 +119,9 @@ int main(int argc, char* argv[]) {
     }
 
     // Check if we should just print info (no action specified)
-    bool hasAction = opts.enablePreview || opts.saveFrames || opts.captureCountSpecified || !opts.outputDir.empty();
+    const bool hasCaptureAction =
+        opts.saveFrames || opts.captureCountSpecified || !opts.outputDir.empty() || !opts.recordVideoPath.empty();
+    const bool hasAction = opts.enablePreview || hasCaptureAction;
 
     // Check if video file playback is requested but not supported on Linux
 #if defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
@@ -186,7 +182,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     // Default: capture mode
-    if (!opts.outputDir.empty() || opts.captureCountSpecified || opts.saveFrames) {
+    if (hasCaptureAction) {
         return ccap_cli::captureFrames(opts);
     }
 

@@ -172,6 +172,15 @@ void printUsage(const char* programName) {
 #endif
               << "\n";
 
+#ifdef CCAP_ENABLE_VIDEO_WRITER
+    std::cout << "Video recording options (camera mode only):\n"
+              << "  --record file              record camera frames to a video file (e.g., output.mp4)\n"
+              << "                             Use -c to limit the number of frames, or --timeout for duration\n"
+              << "                             Can be combined with --preview to preview while recording\n"
+              << "                             Supported formats: .mp4, .mov\n"
+              << "\n";
+#endif
+
 #ifdef CCAP_CLI_WITH_GLFW
     std::cout << "Preview options:\n"
               << "  -p, --preview              enable window preview\n"
@@ -227,6 +236,9 @@ void printUsage(const char* programName) {
 #ifdef CCAP_CLI_WITH_GLFW
     std::cout << "  " << programName << " -d 0 --preview\n"
               << "  " << programName << " -i /path/to/video.mp4 --preview\n";
+#ifdef CCAP_ENABLE_VIDEO_WRITER
+    std::cout << "  " << programName << " -d 0 --preview --record output.mp4 --timeout 5\n";
+#endif
 #endif
 #ifdef CCAP_CLI_WITH_STB_IMAGE
     std::cout << "  " << programName << " --convert input.yuv --yuv-format nv12 --yuv-width 1920 --yuv-height 1080 --convert-output output.jpg --image-format jpg\n";
@@ -344,6 +356,10 @@ CLIOptions parseArgs(int argc, char* argv[]) {
             opts.showVersion = true;
         } else if (arg == "--verbose") {
             opts.verbose = true;
+            opts.quiet = false;
+        } else if (arg == "-q" || arg == "--quiet") {
+            opts.quiet = true;
+            opts.verbose = false;
         } else if (arg == "--json") {
             opts.jsonOutput = true;
         } else if (arg == "--schema-version") {
@@ -391,6 +407,19 @@ CLIOptions parseArgs(int argc, char* argv[]) {
             if (i + 1 < argc) {
                 opts.videoFilePath = argv[++i];
             }
+        } else if (arg == "--record") {
+#ifdef CCAP_ENABLE_VIDEO_WRITER
+            if (i + 1 >= argc || argv[i + 1][0] == '-') {
+                std::cerr << "Error: --record requires an output file path.\n\n";
+                printUsage(argv[0]);
+                std::exit(1);
+            }
+            opts.recordVideoPath = argv[++i];
+#else
+            std::cerr << "Error: --record is not supported in this build. Rebuild with CCAP_ENABLE_VIDEO_WRITER=ON.\n\n";
+            printUsage(argv[0]);
+            std::exit(1);
+#endif
         } else if (arg == "-w" || arg == "--width") {
             if (i + 1 < argc) {
                 opts.width = std::atoi(argv[++i]);
