@@ -27,7 +27,16 @@
 #include <chrono>
 #include <cmath>
 #include <guiddef.h>
+// AVX2 intrinsics — x86/x64 only. MSVC's <immintrin.h> hard-errors
+// out on ARM64 (the diagnostic claims ARM64 support but the header
+// itself rejects non-x86 targets). `hasAVX2()` is defined in
+// ccap_convert_avx2.cpp behind the same arch guard and returns
+// false on ARM64, so dropping the include here is safe — the only
+// reference left in this TU is the status-log call near the bottom
+// of the file, which evaluates to false on ARM64.
+#if !defined(_M_ARM) && !defined(_M_ARM64) && !defined(__arm__) && !defined(__aarch64__)
 #include <immintrin.h> // AVX2
+#endif
 #include <vector>
 
 #if _CCAP_LOG_ENABLED_

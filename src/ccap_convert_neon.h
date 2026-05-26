@@ -13,9 +13,15 @@
 
 #include <cstdint>
 
-// NEON support detection for ARM64 platforms
+// NEON support detection for ARM64 platforms. We exclude MSVC
+// because ccap_convert_neon.cpp uses `uint8x8x2_t` brace-init
+// syntax (e.g. `vtbl2_u8({a, b}, idx)`) that GCC/Clang accept as a
+// compound literal but MSVC rejects with C2059. Falling back to
+// the portable C path costs some perf on Windows ARM64 but avoids
+// patching ~50 sites in the NEON kernels.
 #if (defined(__aarch64__) || defined(_M_ARM64)) && \
-    (defined(__APPLE__) || defined(_WIN32) || defined(__ANDROID__) || defined(__linux__))
+    (defined(__APPLE__) || defined(_WIN32) || defined(__ANDROID__) || defined(__linux__)) && \
+    !defined(_MSC_VER)
 #define ENABLE_NEON_IMP 1
 #else
 #define ENABLE_NEON_IMP 0
