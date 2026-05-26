@@ -681,6 +681,62 @@ bool ProviderDirectShow::open(std::string_view deviceNameOrFilePath) {
     return openCamera(deviceNameOrFilePath);
 }
 
+bool ProviderDirectShow::openByIndex(int deviceIndex) {
+    // Direct-by-index path. The default fallback in ProviderImp
+    // converts index → name → open(name), which on DirectShow loses
+    // information whenever two devices share a friendly name (the
+    // two Apple Studio Display webcams attached to a Mac both
+    // enumerate as "Studio Display-Kamera"); the name-based open
+    // then always binds to the first match no matter which index
+    // the caller passed. Here we iterate the same moniker
+    // enumeration and bind directly to the Nth moniker, which is
+    // the unique-per-device handle DirectShow already gives us.
+    if (m_isOpened || m_mediaControl
+#ifdef CCAP_ENABLE_FILE_PLAYBACK
+        || m_fileReader
+#endif
+    ) {
+        reportError(ErrorCode::DeviceOpenFailed, "Camera or file already opened, please close it first");
+        return false;
+    }
+
+    m_isFileMode = false;
+    bool found = false;
+    int seen = 0;
+
+    enumerateDevices([&](IMoniker* moniker, std::string_view name) {
+        if (seen != deviceIndex) {
+            seen++;
+            return false; // not yet at target index, keep enumerating
+        }
+        auto hr = moniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&m_deviceFilter);
+        if (SUCCEEDED(hr)) {
+            CCAP_LOG_V("ccap: Using video capture device by index %d: %s\n", deviceIndex, name.data());
+            m_deviceName = name;
+            found = true;
+        } else {
+            reportError(ErrorCode::InvalidDevice,
+                        "Device at index " + std::to_string(deviceIndex) + " (\"" +
+                            std::string(name) + "\") failed to bind");
+        }
+        return true; // stop enumeration whether we succeeded or hit a bind error
+    });
+
+    if (!found) {
+        reportError(ErrorCode::InvalidDevice, "No video capture device at index " + std::to_string(deviceIndex));
+        return false;
+    }
+
+    // The original `openCamera` continues after the bind to wire up
+    // the filter graph, sample grabber, etc. Reuse that tail by
+    // calling `openCamera` with the resolved name as a sentinel —
+    // but we've already bound `m_deviceFilter`, so we'd open it
+    // twice. Cleaner: extract the post-bind setup into a helper.
+    // For now, just delegate to a small inline replay of what
+    // `openCamera` does after the bind succeeds.
+    return finishCameraOpenAfterBind();
+}
+
 bool ProviderDirectShow::openFile(std::string_view filePath) {
 #ifndef CCAP_ENABLE_FILE_PLAYBACK
     CCAP_LOG_E("File playback support is disabled. Rebuild with CCAP_ENABLE_FILE_PLAYBACK=ON to enable this feature.\n");
@@ -744,6 +800,10 @@ bool ProviderDirectShow::openCamera(std::string_view deviceName) {
         return false;
     }
 
+    return finishCameraOpenAfterBind();
+}
+
+bool ProviderDirectShow::finishCameraOpenAfterBind() {
     CCAP_LOG_I("ccap: Found video capture device: %s\n", m_deviceName.c_str());
 
     if (!buildGraph()) {

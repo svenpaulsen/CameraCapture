@@ -238,6 +238,7 @@ public:
 private:
     void applyCachedState(ProviderImp* imp) const;
     bool tryOpenWithImplementation(ProviderImp* imp, std::string_view deviceName, bool autoStart) const;
+    bool tryOpenByIndexWithImplementation(ProviderImp* imp, int deviceIndex, bool autoStart) const;
 
 private:
     ProviderImp* m_imp = nullptr;

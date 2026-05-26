@@ -71,6 +71,22 @@ public:
 
     virtual std::vector<std::string> findDeviceNames() = 0;
     virtual bool open(std::string_view deviceName) = 0;
+
+    /// Open by enumeration index. Default falls back to looking up
+    /// `findDeviceNames()[deviceIndex]` and dispatching to
+    /// `open(std::string_view)`. Backends override this when their
+    /// underlying device list can contain duplicate friendly names
+    /// (DirectShow on Windows hands out two identical
+    /// "Studio Display-Kamera" entries when both displays are
+    /// connected; the name-based fallback always picks the first
+    /// match so callers can't actually reach the second cam).
+    virtual bool openByIndex(int deviceIndex) {
+        auto names = findDeviceNames();
+        if (deviceIndex < 0 || deviceIndex >= static_cast<int>(names.size())) {
+            return false;
+        }
+        return open(names[deviceIndex]);
+    }
     virtual bool isOpened() const = 0;
     virtual std::optional<DeviceInfo> getDeviceInfo() const = 0;
     virtual void close() = 0;

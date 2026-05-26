@@ -73,6 +73,16 @@ public:
     ~ProviderDirectShow() override;
     std::vector<std::string> findDeviceNames() override;
     bool open(std::string_view deviceName) override;
+    bool openByIndex(int deviceIndex) override;
+
+private:
+    /// Shared tail between `openCamera` and `openByIndex`: once
+    /// `m_deviceFilter` has been bound to a moniker, build the
+    /// filter graph + sample grabber + media control plumbing.
+    /// Returns true and sets `m_isOpened` on success.
+    bool finishCameraOpenAfterBind();
+
+public:
     bool isOpened() const override;
     std::optional<DeviceInfo> getDeviceInfo() const override;
     void close() override;

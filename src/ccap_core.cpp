@@ -518,6 +518,25 @@ bool Provider::tryOpenWithImplementation(ProviderImp* imp, std::string_view devi
     return true;
 }
 
+bool Provider::tryOpenByIndexWithImplementation(ProviderImp* imp, int deviceIndex, bool autoStart) const {
+    if (!imp) {
+        return false;
+    }
+
+    applyCachedState(imp);
+    if (!imp->openByIndex(deviceIndex)) {
+        imp->close();
+        return false;
+    }
+
+    if (autoStart && !imp->start()) {
+        imp->close();
+        return false;
+    }
+
+    return true;
+}
+
 std::vector<std::string> Provider::findDeviceNames() {
     if (!m_imp) {
         return std::vector<std::string>();
@@ -606,18 +625,63 @@ bool Provider::open(int deviceIndex, bool autoStart) {
         return false;
     }
 
-    std::string deviceName;
-    if (deviceIndex >= 0) {
-        auto deviceNames = findDeviceNames();
-        if (!deviceNames.empty()) {
-            deviceIndex = std::min(deviceIndex, static_cast<int>(deviceNames.size()) - 1);
-            deviceName = deviceNames[deviceIndex];
-
-            CCAP_LOG_V("ccap: input device index %d, selected device name: %s\n", deviceIndex, deviceName.c_str());
-        }
+    if (deviceIndex < 0) {
+        // Negative index = "any device"; let the string overload
+        // pick whatever the current backend prefers.
+        return open(std::string{}, autoStart);
     }
 
-    return open(deviceName, autoStart);
+#if defined(_MSC_VER) || defined(_WIN32)
+    // Mirror of the string overload's backend-selection logic, but
+    // dispatching to `openByIndex` so the raw device index reaches
+    // the platform backend (DSHOW iterates monikers, so it can
+    // distinguish two devices that share a friendly name — e.g.
+    // two Apple Studio Display webcams both enumerate as
+    // "Studio Display-Kamera" and the old name-lookup detour bound
+    // both indices to the same physical device).
+    if (m_imp->isOpened()) {
+        return m_imp->openByIndex(deviceIndex) && (!autoStart || m_imp->start());
+    }
+
+    auto tryBackend = [&](WindowsBackendPreference preference) {
+        std::unique_ptr<ProviderImp> candidate(createWindowsProvider(preference));
+        if (!candidate || !tryOpenByIndexWithImplementation(candidate.get(), deviceIndex, autoStart)) {
+            return false;
+        }
+        transferProviderState(m_imp, candidate.get());
+        delete m_imp;
+        m_imp = candidate.release();
+        return true;
+    };
+
+    WindowsBackendPreference preference = resolveWindowsBackendPreference(copyProviderState(m_imp).extraInfo);
+    if (preference == WindowsBackendPreference::DirectShow) {
+        return tryBackend(WindowsBackendPreference::DirectShow);
+    }
+
+    if (preference == WindowsBackendPreference::MSMF) {
+        if (!isMediaFoundationCameraBackendAvailable()) {
+            reportError(ErrorCode::InitializationFailed, "Media Foundation camera backend is unavailable on this system");
+            return false;
+        }
+        return tryBackend(WindowsBackendPreference::MSMF);
+    }
+
+    // Auto mode — try DSHOW first, then MSMF.
+    for (auto candidate : {WindowsBackendPreference::DirectShow, WindowsBackendPreference::MSMF}) {
+        if (candidate == WindowsBackendPreference::MSMF && !isMediaFoundationCameraBackendAvailable()) {
+            continue;
+        }
+        if (tryBackend(candidate)) {
+            return true;
+        }
+    }
+    return false;
+#else
+    // Non-Windows backends don't have the duplicate-name issue, so
+    // the default `openByIndex` (name lookup → `open(name)`) is OK.
+    return m_imp->openByIndex(deviceIndex) && (!autoStart || m_imp->start());
+#endif
 }
 
 bool Provider::isOpened() const { return m_imp && m_imp->isOpened(); }
