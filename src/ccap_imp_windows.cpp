@@ -918,10 +918,22 @@ HRESULT STDMETHODCALLTYPE ProviderDirectShow::SampleCB(double sampleTime, IMedia
     newFrame->pixelFormat = m_frameProp.cameraPixelFormat;
     newFrame->width = m_frameProp.width;
     newFrame->height = m_frameProp.height;
+    // YUV outputs are always laid out top-down (NV12 / I420 / YUYV /
+    // UYVY have no BMP-style bottom-up convention). For non-YUV
+    // outputs honor the caller-requested orientation. The
+    // zero-copy-fallback branch below overrides this when the
+    // conversion couldn't run, so the orientation always reflects
+    // the layout of whatever bytes we actually hand out.
     newFrame->orientation = isOutputYUV ? FrameOrientation::TopToBottom : m_frameOrientation;
     newFrame->nativeHandle = nullptr;
 
-    bool shouldFlip = newFrame->orientation != m_inputOrientation && !isOutputYUV;
+    // Flip whenever the input orientation differs from what the
+    // output will be after conversion — regardless of whether output
+    // is YUV. Previously this gated on `!isOutputYUV`, which left
+    // YUV outputs upside-down for any RGB capture that needed the
+    // BMP bottom-up flip (Logitech webcams via DirectShow's CSC are
+    // the common case). The RGB→NV12 path now honors `verticalFlip`.
+    bool shouldFlip = newFrame->orientation != m_inputOrientation;
     bool shouldConvert = m_frameProp.cameraPixelFormat != effectiveOutputFormat;
     bool zeroCopy = !shouldConvert && !shouldFlip;
 
@@ -1018,6 +1030,12 @@ HRESULT STDMETHODCALLTYPE ProviderDirectShow::SampleCB(double sampleTime, IMedia
     if (zeroCopy) {
         // Conversion may fail. If conversion fails, fall back to zero-copy mode.
         // In this case, the returned format is the original camera input format.
+        // Also surface the *actual* orientation of those bytes — the value
+        // assigned at the top of the function assumed the conversion would
+        // run and rotate the data, which it didn't. Consumers walk this
+        // field to decide whether to apply a render-side flip.
+        newFrame->pixelFormat = m_frameProp.cameraPixelFormat;
+        newFrame->orientation = m_inputOrientation;
         newFrame->sizeInBytes = bufferLen;
         newFrame->nativeHandle = mediaSample;
 
