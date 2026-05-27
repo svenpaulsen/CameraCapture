@@ -126,6 +126,74 @@ bool inplaceConvertFrameYUV2RGBColor(VideoFrame* frame, PixelFormat toFormat, bo
     return false;
 }
 
+bool inplaceConvertFrameRGB2YUV(VideoFrame* frame, PixelFormat toFormat, bool verticalFlip) { /// (BGR24/RGB24/BGRA32/RGBA32) -> NV12
+
+    assert(frame->allocator == nullptr || frame->data[0] != frame->allocator->data() && "DESIGN VIOLATION: frame->data[0] must point to external memory (e.g., camera buffer), not allocator memory. "
+                                                                                        "Each VideoFrame should only be converted ONCE using inplaceConvertFrame*() functions.");
+
+    auto inputFormat = frame->pixelFormat;
+    assert((inputFormat & kPixelFormatYUVColorBit) == 0 && (toFormat & kPixelFormatYUVColorBit) != 0);
+
+    // Only NV12 output is supported. I420 / YUYV / UYVY can be added
+    // later — every modern capture+encode consumer we have wants
+    // NV12 anyway.
+    if (!pixelFormatInclude(toFormat, PixelFormat::NV12)) {
+        static bool sLoggedUnsupported = false;
+        if (!sLoggedUnsupported) {
+            CCAP_LOG_W("ccap: RGB to non-NV12 YUV is not implemented, skipping conversion\n");
+            sLoggedUnsupported = true;
+        }
+        return false;
+    }
+
+    const bool inputHasAlpha = (inputFormat & kPixelFormatAlphaColorBit) != 0;
+    const bool isInputBGR = (inputFormat & kPixelFormatBGRBit) != 0; // not BGR = RGB
+    const int channels = inputHasAlpha ? 4 : 3;
+
+    const uint8_t* inputData = frame->data[0];
+    const int inputStride = frame->stride[0];
+    const int width = frame->width;
+    const int height = frame->height;
+
+    // NV12: Y plane (width * height) followed by interleaved UV
+    // plane (width * height / 2). 16-byte align the Y stride so SIMD
+    // back-ends added later can stream into it without extra
+    // shifting.
+    const int dstYStride = (width + 15) & ~15;
+    const int dstUVStride = dstYStride;
+    const size_t ySize = static_cast<size_t>(dstYStride) * height;
+    const size_t uvSize = static_cast<size_t>(dstUVStride) * (height / 2);
+    frame->allocator->resize(ySize + uvSize);
+    uint8_t* dstY = frame->allocator->data();
+    uint8_t* dstUV = dstY + ySize;
+
+    frame->data[0] = dstY;
+    frame->data[1] = dstUV;
+    frame->data[2] = nullptr;
+    frame->stride[0] = dstYStride;
+    frame->stride[1] = dstUVStride;
+    frame->stride[2] = 0;
+    frame->pixelFormat = toFormat;
+
+    const int packedHeight = verticalFlip ? -height : height;
+
+    if (channels == 3) {
+        if (isInputBGR) {
+            bgr24ToNv12(inputData, inputStride, dstY, dstYStride, dstUV, dstUVStride, width, packedHeight);
+        } else {
+            rgb24ToNv12(inputData, inputStride, dstY, dstYStride, dstUV, dstUVStride, width, packedHeight);
+        }
+    } else {
+        if (isInputBGR) {
+            bgra32ToNv12(inputData, inputStride, dstY, dstYStride, dstUV, dstUVStride, width, packedHeight);
+        } else {
+            rgba32ToNv12(inputData, inputStride, dstY, dstYStride, dstUV, dstUVStride, width, packedHeight);
+        }
+    }
+
+    return true;
+}
+
 bool inplaceConvertFrameRGB(VideoFrame* frame, PixelFormat toFormat, bool verticalFlip) {
     // RGB(A) interconversion
 
@@ -243,13 +311,12 @@ inline bool inplaceConvertFrameImp(VideoFrame* frame, PixelFormat toFormat, bool
         if (isInputYUV) // yuv -> BGR
             return inplaceConvertFrameYUV2RGBColor(frame, toFormat, verticalFlip);
 
-        // Best-effort log suppression only; occasional duplicate warnings are acceptable.
-        static bool sLoggedRgbToYuvUnsupported = false;
-        if (!sLoggedRgbToYuvUnsupported) {
-            CCAP_LOG_W("ccap: RGB to YUV conversion is not supported, skipping conversion\n");
-            sLoggedRgbToYuvUnsupported = true;
-        }
-        return false; // no rgb -> yuv
+        // RGB → YUV. Currently only NV12 output is implemented;
+        // `inplaceConvertFrameRGB2YUV` falls through to `false` for
+        // anything else, which makes ccap fall back to zero-copy on
+        // the raw camera buffer (with `orientation` set to the
+        // input's real orientation by the capture impl).
+        return inplaceConvertFrameRGB2YUV(frame, toFormat, verticalFlip);
     }
 
     return inplaceConvertFrameRGB(frame, toFormat, verticalFlip);

@@ -734,6 +734,113 @@ void uyvyToRgba32(const uint8_t* src, int srcStride, uint8_t* dst, int dstStride
     uyvyToRgb_common<false, true>(src, srcStride, dst, dstStride, width, height, flag);
 }
 
+//////////////  RGB to NV12  //////////////
+
+// Pack a 24/32-bpp packed-RGB (or BGR) image into NV12. Two source
+// rows are consumed per UV row so 2x2 chroma sub-sampling can
+// average all four luma pixels per chroma sample. The destination
+// can be written in reverse Y order by passing a negative `height`
+// — that's what the file-graph path uses to fold the BMP bottom-up
+// flip into the conversion instead of running it as a second pass.
+template <int channels, bool isBgrColor>
+void rgbToNv12_common(const uint8_t* src, int srcStride,
+                      uint8_t* dstY, int dstYStride,
+                      uint8_t* dstUV, int dstUVStride,
+                      int width, int height, ConvertFlag flag) {
+    static_assert(channels == 3 || channels == 4, "channels must be 3 or 4");
+    // Negative height = mirror destination row order. Same trick the
+    // yuv→rgb path uses. The chroma plane mirrors along with the Y
+    // plane so luma / chroma stay row-aligned after the flip.
+    if (height < 0) {
+        height = -height;
+        const int chromaRows = height / 2;
+        dstY = dstY + (height - 1) * dstYStride;
+        dstYStride = -dstYStride;
+        dstUV = dstUV + (chromaRows - 1) * dstUVStride;
+        dstUVStride = -dstUVStride;
+    }
+
+    constexpr int rIdx = isBgrColor ? 2 : 0;
+    constexpr int gIdx = 1;
+    constexpr int bIdx = isBgrColor ? 0 : 2;
+
+    const bool is601 = (flag & ConvertFlag::BT601) != 0;
+    const bool isFullRange = (flag & ConvertFlag::FullRange) != 0;
+    const auto convertFunc = getRgbToYuvFunc(is601, isFullRange);
+
+    for (int y = 0; y < height; y += 2) {
+        const uint8_t* srcRow0 = src + y * srcStride;
+        const uint8_t* srcRow1 = src + (y + 1 < height ? y + 1 : y) * srcStride;
+        uint8_t* dstYRow0 = dstY + y * dstYStride;
+        uint8_t* dstYRow1 = dstY + (y + 1 < height ? y + 1 : y) * dstYStride;
+        uint8_t* dstUVRow = dstUV + (y / 2) * dstUVStride;
+
+        for (int x = 0; x < width; x += 2) {
+            const int x1 = x + 1 < width ? x + 1 : x;
+            int r00 = srcRow0[x * channels + rIdx];
+            int g00 = srcRow0[x * channels + gIdx];
+            int b00 = srcRow0[x * channels + bIdx];
+            int r01 = srcRow0[x1 * channels + rIdx];
+            int g01 = srcRow0[x1 * channels + gIdx];
+            int b01 = srcRow0[x1 * channels + bIdx];
+            int r10 = srcRow1[x * channels + rIdx];
+            int g10 = srcRow1[x * channels + gIdx];
+            int b10 = srcRow1[x * channels + bIdx];
+            int r11 = srcRow1[x1 * channels + rIdx];
+            int g11 = srcRow1[x1 * channels + gIdx];
+            int b11 = srcRow1[x1 * channels + bIdx];
+
+            int y00, u00, v00;
+            int y01, u01, v01;
+            int y10, u10, v10;
+            int y11, u11, v11;
+            convertFunc(r00, g00, b00, y00, u00, v00);
+            convertFunc(r01, g01, b01, y01, u01, v01);
+            convertFunc(r10, g10, b10, y10, u10, v10);
+            convertFunc(r11, g11, b11, y11, u11, v11);
+
+            dstYRow0[x] = static_cast<uint8_t>(y00);
+            dstYRow0[x1] = static_cast<uint8_t>(y01);
+            dstYRow1[x] = static_cast<uint8_t>(y10);
+            dstYRow1[x1] = static_cast<uint8_t>(y11);
+
+            // 2x2 chroma average. Output is centered post-matrix
+            // already (rgb2yuv*v adds the +128 chroma offset), so
+            // averaging the post-offset values keeps the center.
+            dstUVRow[x] = static_cast<uint8_t>((u00 + u01 + u10 + u11 + 2) >> 2);
+            dstUVRow[x1] = static_cast<uint8_t>((v00 + v01 + v10 + v11 + 2) >> 2);
+        }
+    }
+}
+
+void bgr24ToNv12(const uint8_t* src, int srcStride,
+                 uint8_t* dstY, int dstYStride,
+                 uint8_t* dstUV, int dstUVStride,
+                 int width, int height, ConvertFlag flag) {
+    rgbToNv12_common<3, true>(src, srcStride, dstY, dstYStride, dstUV, dstUVStride, width, height, flag);
+}
+
+void rgb24ToNv12(const uint8_t* src, int srcStride,
+                 uint8_t* dstY, int dstYStride,
+                 uint8_t* dstUV, int dstUVStride,
+                 int width, int height, ConvertFlag flag) {
+    rgbToNv12_common<3, false>(src, srcStride, dstY, dstYStride, dstUV, dstUVStride, width, height, flag);
+}
+
+void bgra32ToNv12(const uint8_t* src, int srcStride,
+                  uint8_t* dstY, int dstYStride,
+                  uint8_t* dstUV, int dstUVStride,
+                  int width, int height, ConvertFlag flag) {
+    rgbToNv12_common<4, true>(src, srcStride, dstY, dstYStride, dstUV, dstUVStride, width, height, flag);
+}
+
+void rgba32ToNv12(const uint8_t* src, int srcStride,
+                  uint8_t* dstY, int dstYStride,
+                  uint8_t* dstUV, int dstUVStride,
+                  int width, int height, ConvertFlag flag) {
+    rgbToNv12_common<4, false>(src, srcStride, dstY, dstYStride, dstUV, dstUVStride, width, height, flag);
+}
+
 static thread_local std::shared_ptr<ccap::Allocator> sSharedAllocator, sSharedAllocator2;
 static std::mutex sAllocatorMutex;
 static std::vector<std::pair<std::weak_ptr<ccap::Allocator>, std::shared_ptr<ccap::Allocator>*>> sAllAllocators;

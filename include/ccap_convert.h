@@ -150,6 +150,46 @@ inline void yuv2rgb709f(int y, int u, int v, int& r, int& g, int& b) {
     b = std::clamp(b, 0, 255);
 }
 
+/// @brief RGB to YUV BT.601 video-range (output bytes are post-offset)
+inline void rgb2yuv601v(int r, int g, int b, int& y, int& u, int& v) {
+    y = ((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
+    u = ((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
+    v = ((112 * r - 94 * g - 18 * b + 128) >> 8) + 128;
+    y = std::clamp(y, 0, 255);
+    u = std::clamp(u, 0, 255);
+    v = std::clamp(v, 0, 255);
+}
+
+/// @brief RGB to YUV BT.709 video-range (output bytes are post-offset)
+inline void rgb2yuv709v(int r, int g, int b, int& y, int& u, int& v) {
+    y = ((54 * r + 183 * g + 18 * b + 128) >> 8) + 16;
+    u = ((-29 * r - 99 * g + 128 * b + 128) >> 8) + 128;
+    v = ((128 * r - 116 * g - 12 * b + 128) >> 8) + 128;
+    y = std::clamp(y, 0, 255);
+    u = std::clamp(u, 0, 255);
+    v = std::clamp(v, 0, 255);
+}
+
+/// @brief RGB to YUV BT.601 full-range (output bytes are post-offset)
+inline void rgb2yuv601f(int r, int g, int b, int& y, int& u, int& v) {
+    y = (77 * r + 150 * g + 29 * b + 128) >> 8;
+    u = ((-43 * r - 84 * g + 127 * b + 128) >> 8) + 128;
+    v = ((127 * r - 106 * g - 21 * b + 128) >> 8) + 128;
+    y = std::clamp(y, 0, 255);
+    u = std::clamp(u, 0, 255);
+    v = std::clamp(v, 0, 255);
+}
+
+/// @brief RGB to YUV BT.709 full-range (output bytes are post-offset)
+inline void rgb2yuv709f(int r, int g, int b, int& y, int& u, int& v) {
+    y = (54 * r + 183 * g + 18 * b + 128) >> 8;
+    u = ((-29 * r - 99 * g + 128 * b + 128) >> 8) + 128;
+    v = ((128 * r - 116 * g - 12 * b + 128) >> 8) + 128;
+    y = std::clamp(y, 0, 255);
+    u = std::clamp(u, 0, 255);
+    v = std::clamp(v, 0, 255);
+}
+
 enum class ConvertFlag {
     BT601 = 0x1,                  ///< Use BT.601 color space
     BT709 = 0x2,                  ///< Use BT.709 color space
@@ -178,6 +218,23 @@ inline YuvToRgbFunc getYuvToRgbFunc(bool is601, bool isFullRange) {
             return yuv2rgb709f;
         else
             return yuv2rgb709v;
+    }
+}
+
+// Define RGB to YUV conversion function pointer type
+typedef void (*RgbToYuvFunc)(int r, int g, int b, int& y, int& u, int& v);
+
+inline RgbToYuvFunc getRgbToYuvFunc(bool is601, bool isFullRange) {
+    if (is601) {
+        if (isFullRange)
+            return rgb2yuv601f;
+        else
+            return rgb2yuv601v;
+    } else {
+        if (isFullRange)
+            return rgb2yuv709f;
+        else
+            return rgb2yuv709v;
     }
 }
 
@@ -305,6 +362,36 @@ CCAP_EXPORT void uyvyToBgra32(const uint8_t* src, int srcStride,
 
 CCAP_EXPORT void uyvyToRgba32(const uint8_t* src, int srcStride,
                   uint8_t* dst, int dstStride,
+                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+
+//////////// rgb color to yuv color /////////////
+//
+// `dstY` and `dstUV` may point into the same allocation as long as
+// the UV plane is laid out immediately after the Y plane and the
+// caller respects the NV12 layout (Y plane of `dstYStride * height`
+// bytes followed by interleaved UV plane of `dstUVStride * height/2`
+// bytes). Negative `height` is supported and means: read source
+// rows in reverse (BMP-style bottom-up sources become top-down NV12
+// without a separate scratch buffer).
+
+CCAP_EXPORT void bgr24ToNv12(const uint8_t* src, int srcStride,
+                 uint8_t* dstY, int dstYStride,
+                 uint8_t* dstUV, int dstUVStride,
+                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+
+CCAP_EXPORT void rgb24ToNv12(const uint8_t* src, int srcStride,
+                 uint8_t* dstY, int dstYStride,
+                 uint8_t* dstUV, int dstUVStride,
+                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+
+CCAP_EXPORT void bgra32ToNv12(const uint8_t* src, int srcStride,
+                  uint8_t* dstY, int dstYStride,
+                  uint8_t* dstUV, int dstUVStride,
+                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+
+CCAP_EXPORT void rgba32ToNv12(const uint8_t* src, int srcStride,
+                  uint8_t* dstY, int dstYStride,
+                  uint8_t* dstUV, int dstUVStride,
                   int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 class Allocator;
