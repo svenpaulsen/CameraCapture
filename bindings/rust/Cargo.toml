@@ -38,6 +38,7 @@ cc = "1.0"
 default = ["build-source"]
 static-link = [] # Link against pre-built static library (for development)
 build-source = [] # Build from source using cc crate (for distribution)
+no-device-verify = [] # Skip BindToObject verify in DSHOW findDeviceNames (Windows; cam may LED-on during enum without it)
 
 [[example]]
 name = "print_camera"

@@ -81,6 +81,8 @@ fn main() {
     println!("cargo:rerun-if-env-changed=CCAP_SOURCE_DIR");
     // Allow users to opt out ASan runtime auto-link (for static-link + ASan prebuilt libs).
     println!("cargo:rerun-if-env-changed=CCAP_RUST_NO_ASAN_LINK");
+    // Rebuild when the `no-device-verify` feature is toggled.
+    println!("cargo:rerun-if-env-changed=CARGO_FEATURE_NO_DEVICE_VERIFY");
 
     // Tell cargo to look for shared libraries in the specified directory
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -210,6 +212,13 @@ Please vendor the sources into bindings/rust/native/, or set CCAP_SOURCE_DIR to 
 
         // Enable file playback support
         build.define("CCAP_ENABLE_FILE_PLAYBACK", "1");
+
+        // Opt-in via the `no-device-verify` feature; Windows-only.
+        if env::var("CARGO_FEATURE_NO_DEVICE_VERIFY").is_ok()
+            && env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("windows")
+        {
+            build.define("CCAP_WIN_NO_DEVICE_VERIFY", "1");
+        }
 
         #[cfg(target_os = "macos")]
         {
