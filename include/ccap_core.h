@@ -92,6 +92,21 @@ public:
     std::vector<std::string> findDeviceNames();
 
     /**
+     * @brief Like findDeviceNames(), but also returns a stable, unique id per
+     *        device and never opens any device (no camera LED, fast — and
+     *        independent of any device-verify build option).
+     * @return A list of {name, id} entries. On Windows the id is the
+     *         DirectShow DevicePath; on backends/platforms that cannot supply
+     *         one the id is empty.
+     * @note Unlike findDeviceNames(), the list is in raw enumeration order and
+     *       is not reordered (virtual cameras are not moved to the end), so the
+     *       index of each entry matches `open(int deviceIndex)`. The id lets you
+     *       tell apart devices that share the same friendly name and persist a
+     *       selection across sessions.
+     */
+    std::vector<DeviceIdentity> findDeviceIdentities();
+
+    /**
      * @brief Opens a capture device.
      *
      * @param deviceName The name of the device to open. The format is platform-dependent. Pass an empty string to use the default device.

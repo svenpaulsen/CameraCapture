@@ -207,6 +207,16 @@ impl ColorConversionBackend {
     }
 }
 
+/// A device's friendly name plus a stable, unique id (Windows: DirectShow
+/// DevicePath). Obtaining these never opens the camera, unlike `find_device_names()`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DeviceIdentity {
+    /// Friendly name; may be shared by several devices, which is why `id` exists.
+    pub name: String,
+    /// Stable per-device id (Windows: DevicePath). Empty if unavailable.
+    pub id: String,
+}
+
 /// Resolution structure
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Resolution {

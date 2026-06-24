@@ -464,6 +464,36 @@ std::vector<std::string> ProviderDirectShow::findDeviceNames() {
     return m_allDeviceNames;
 }
 
+std::vector<DeviceIdentity> ProviderDirectShow::findDeviceIdentities() {
+    std::vector<DeviceIdentity> identities;
+
+    // Raw enumeration order, no reordering: the index of each entry must line
+    // up with openByIndex(). We only read the property bag (BindToStorage +
+    // Read), never BindToObject — so no capture filter is instantiated and the
+    // camera LED stays off, regardless of the device-verify build option.
+    enumerateDevices([&](IMoniker* moniker, std::string_view name) {
+        std::string devicePath;
+        IPropertyBag* propertyBag = nullptr;
+        if (SUCCEEDED(moniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&propertyBag)) && propertyBag) {
+            VARIANT pathVariant;
+            VariantInit(&pathVariant);
+            // DevicePath is a stable, unique per-device id. Virtual cameras
+            // (OBS etc.) often don't expose it; leave the id empty in that case.
+            if (SUCCEEDED(propertyBag->Read(L"DevicePath", &pathVariant, 0)) && pathVariant.vt == VT_BSTR && pathVariant.bstrVal) {
+                char buf[CCAP_MAX_DEVICE_ID_LENGTH] = { 0 };
+                WideCharToMultiByte(CP_UTF8, 0, pathVariant.bstrVal, -1, buf, sizeof(buf), nullptr, nullptr);
+                devicePath = buf;
+            }
+            VariantClear(&pathVariant);
+            propertyBag->Release();
+        }
+        identities.push_back(DeviceIdentity{ std::string(name), std::move(devicePath) });
+        return false; // keep enumerating; preserve raw order
+    });
+
+    return identities;
+}
+
 bool ProviderDirectShow::buildGraph() {
     HRESULT hr = S_OK;
 

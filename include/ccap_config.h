@@ -79,6 +79,10 @@
 // Maximum length for device name strings
 #define CCAP_MAX_DEVICE_NAME_LENGTH 128
 
+// Maximum length for stable device id strings (e.g. Windows DevicePath, which
+// can be considerably longer than the friendly name)
+#define CCAP_MAX_DEVICE_ID_LENGTH 512
+
 // Maximum number of pixel formats per device
 #define CCAP_MAX_PIXEL_FORMATS 32
 

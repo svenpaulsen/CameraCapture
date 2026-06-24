@@ -72,6 +72,7 @@ public:
     ProviderDirectShow();
     ~ProviderDirectShow() override;
     std::vector<std::string> findDeviceNames() override;
+    std::vector<DeviceIdentity> findDeviceIdentities() override;
     bool open(std::string_view deviceName) override;
     bool openByIndex(int deviceIndex) override;
 

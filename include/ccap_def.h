@@ -462,6 +462,15 @@ struct CCAP_EXPORT DeviceInfo {
     std::vector<Resolution> supportedResolutions;
 };
 
+/**
+ * @brief Device identity: friendly name plus a stable, unique per-device id.
+ *        Unlike findDeviceNames(), obtaining this never opens the device.
+ */
+struct CCAP_EXPORT DeviceIdentity {
+    std::string name; ///< Friendly name, may be shared by several devices
+    std::string id;   ///< Stable unique id (Windows: DirectShow DevicePath). Empty if unavailable.
+};
+
 } // namespace ccap
 
 #if defined(_MSC_VER)

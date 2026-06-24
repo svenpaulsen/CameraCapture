@@ -144,6 +144,18 @@ typedef struct {
     size_t resolutionCount;                                        /**< Number of supported resolutions */
 } CcapDeviceInfo;
 
+/** @brief Device identity: friendly name plus a stable, unique per-device id */
+typedef struct {
+    char deviceName[CCAP_MAX_DEVICE_NAME_LENGTH]; /**< Friendly name (may be shared by several devices) */
+    char deviceId[CCAP_MAX_DEVICE_ID_LENGTH];     /**< Stable unique id (Windows: DevicePath). Empty if unavailable. */
+} CcapDeviceIdentity;
+
+/** @brief Device identity list structure */
+typedef struct {
+    CcapDeviceIdentity devices[CCAP_MAX_DEVICES]; /**< Array of device identities */
+    size_t deviceCount;                           /**< Number of devices found */
+} CcapDeviceIdentityList;
+
 /** @brief Callback function type for new frame notifications */
 typedef bool (*CcapNewFrameCallback)(const CcapVideoFrame* frame, void* userData);
 
@@ -192,6 +204,19 @@ CCAP_EXPORT void ccap_provider_destroy(CcapProvider* provider);
  * @return true on success, false on failure
  */
 CCAP_EXPORT bool ccap_provider_find_device_names_list(CcapProvider* provider, CcapDeviceNamesList* deviceList);
+
+/**
+ * @brief Find all available camera devices together with a stable unique id,
+ *        without opening any device (no camera LED, fast; independent of the
+ *        no-device-verify build option).
+ * @param provider Pointer to CcapProvider instance
+ * @param deviceList Output parameter for the device identity list
+ * @return true on success, false on failure
+ * @note Devices are returned in raw enumeration order, so the array index
+ *       matches ccap_provider_open_by_index. On Windows the id is the DirectShow
+ *       DevicePath; it is empty when the backend cannot supply one.
+ */
+CCAP_EXPORT bool ccap_provider_find_device_identities(CcapProvider* provider, CcapDeviceIdentityList* deviceList);
 
 /* ========== Device Management ========== */
 

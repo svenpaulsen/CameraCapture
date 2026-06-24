@@ -453,6 +453,35 @@ impl Provider {
         self.list_devices()
     }
 
+    /// Enumerate devices with a stable, unique id without opening any camera
+    /// (fast, no LED), unlike `find_device_names()`. Devices are returned in raw
+    /// enumeration order, so each index matches `open_with_index` / `with_device`.
+    /// The `id` is empty on backends that cannot supply one.
+    pub fn find_device_identities(&self) -> Result<Vec<DeviceIdentity>> {
+        let mut list = sys::CcapDeviceIdentityList::default();
+        let success = unsafe { sys::ccap_provider_find_device_identities(self.handle, &mut list) };
+        if !success {
+            return Ok(Vec::new());
+        }
+
+        let mut out = Vec::new();
+        for i in 0..list.deviceCount {
+            let dev = &list.devices[i];
+            let name = unsafe {
+                CStr::from_ptr(dev.deviceName.as_ptr())
+                    .to_string_lossy()
+                    .into_owned()
+            };
+            let id = unsafe {
+                CStr::from_ptr(dev.deviceId.as_ptr())
+                    .to_string_lossy()
+                    .into_owned()
+            };
+            out.push(DeviceIdentity { name, id });
+        }
+        Ok(out)
+    }
+
     /// Get current resolution (convenience getter)
     pub fn resolution(&self) -> Result<(u32, u32)> {
         let width = self.get_property(PropertyName::Width)? as u32;

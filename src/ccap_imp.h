@@ -70,6 +70,19 @@ public:
     void setMaxCacheFrameSize(uint32_t size);
 
     virtual std::vector<std::string> findDeviceNames() = 0;
+
+    /// Like findDeviceNames(), but returns a stable unique id per device and
+    /// must never open the device (no LED). The default maps findDeviceNames()
+    /// to identities with an empty id; backends that can supply a stable id
+    /// (DirectShow exposes the DevicePath) override this to fill it in.
+    virtual std::vector<DeviceIdentity> findDeviceIdentities() {
+        std::vector<DeviceIdentity> out;
+        for (auto& name : findDeviceNames()) {
+            out.push_back(DeviceIdentity{ name, std::string{} });
+        }
+        return out;
+    }
+
     virtual bool open(std::string_view deviceName) = 0;
 
     /// Open by enumeration index. Default falls back to looking up

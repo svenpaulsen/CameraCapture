@@ -296,6 +296,11 @@ std::vector<std::string> collectDeviceNamesFromBackend(WindowsBackendPreference 
     return provider ? provider->findDeviceNames() : std::vector<std::string>();
 }
 
+std::vector<DeviceIdentity> collectDeviceIdentitiesFromBackend(WindowsBackendPreference preference) {
+    std::unique_ptr<ProviderImp> provider(createWindowsProvider(preference));
+    return provider ? provider->findDeviceIdentities() : std::vector<DeviceIdentity>();
+}
+
 bool deviceNameExistsInBackend(std::string_view deviceName, WindowsBackendPreference preference) {
     if (deviceName.empty()) {
         return false;
@@ -561,6 +566,31 @@ std::vector<std::string> Provider::findDeviceNames() {
     return mergeDeviceNames(std::move(preferred), fallback);
 #else
     return m_imp->findDeviceNames();
+#endif
+}
+
+std::vector<DeviceIdentity> Provider::findDeviceIdentities() {
+    if (!m_imp) {
+        return std::vector<DeviceIdentity>();
+    }
+
+#if defined(_MSC_VER) || defined(_WIN32)
+    if (m_imp->isOpened()) {
+        return m_imp->findDeviceIdentities();
+    }
+
+    WindowsBackendPreference preference = resolveWindowsBackendPreference(copyProviderState(m_imp).extraInfo);
+    // Only DirectShow exposes a stable DevicePath id. For MSMF the backend's
+    // default findDeviceIdentities() yields names with empty ids. For Auto we
+    // use DirectShow (it carries the ids and matches the openByIndex order);
+    // unlike findDeviceNames() we deliberately do not merge the MSMF list here,
+    // so the index space stays consistent with open-by-index.
+    if (preference == WindowsBackendPreference::MSMF) {
+        return collectDeviceIdentitiesFromBackend(WindowsBackendPreference::MSMF);
+    }
+    return collectDeviceIdentitiesFromBackend(WindowsBackendPreference::DirectShow);
+#else
+    return m_imp->findDeviceIdentities();
 #endif
 }
 
