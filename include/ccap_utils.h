@@ -3,7 +3,7 @@
  * @author wysaid (this@wysaid.org)
  * @brief Some utility functions for ccap.
  * @date 2025-05
- * 
+ *
  * @note For C language, use ccap_utils_c.h instead of this header.
  *
  */
@@ -22,8 +22,7 @@
 #include <string_view>
 
 // ccap is short for (C)amera(CAP)ture
-namespace ccap
-{
+namespace ccap {
 CCAP_EXPORT std::string_view pixelFormatToString(PixelFormat format);
 
 //////////////////// File Utils ///////////////////
@@ -69,16 +68,14 @@ CCAP_EXPORT bool saveRgbDataAsBMP(const char* filename, const unsigned char* dat
 #define _CCAP_LOG_ENABLED_ 0
 #endif
 
-enum LogLevelConstants
-{
+enum LogLevelConstants {
     kLogLevelErrorBit = 1,
     kLogLevelWarningBit = 2,
     kLogLevelInfoBit = 4,
     kLogLevelVerboseBit = 8
 };
 
-enum class LogLevel
-{
+enum class LogLevel {
     /// @brief No log output.
     None = 0,
     /// @brief Error log level. Will output to `stderr` if an error occurs.
@@ -97,8 +94,7 @@ CCAP_EXPORT void setLogLevel(LogLevel level);
 /// For internal use.
 extern CCAP_EXPORT LogLevel globalLogLevel;
 
-inline bool operator&(LogLevel lhs, LogLevelConstants rhs)
-{
+inline bool operator&(LogLevel lhs, LogLevelConstants rhs) {
     return (static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
 }
 
@@ -108,12 +104,10 @@ inline bool infoLogEnabled() { return globalLogLevel & kLogLevelInfoBit; }
 inline bool verboseLogEnabled() { return globalLogLevel & kLogLevelVerboseBit; }
 
 #define CCAP_CALL_LOG(logLevel, ...)                   \
-    do                                                 \
-    {                                                  \
+    do {                                               \
         if ((static_cast<uint32_t>(logLevel) &         \
              static_cast<uint32_t>(globalLogLevel)) == \
-            static_cast<uint32_t>(logLevel))           \
-        {                                              \
+            static_cast<uint32_t>(logLevel)) {         \
             __VA_ARGS__;                               \
         }                                              \
     } while (0)

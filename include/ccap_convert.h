@@ -17,6 +17,7 @@
 #define CCAP_CONVERT_H
 
 #include "ccap_def.h"
+
 #include <algorithm>
 #include <cstdint>
 #include <memory>
@@ -287,82 +288,82 @@ constexpr auto bgrToRgb = rgbToBgr;
 //////////// yuv color to rgb color /////////////
 
 CCAP_EXPORT void nv12ToBgr24(const uint8_t* srcY, int srcYStride,
-                 const uint8_t* srcUV, int srcUVStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             const uint8_t* srcUV, int srcUVStride,
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void nv12ToRgb24(const uint8_t* srcY, int srcYStride,
-                 const uint8_t* srcUV, int srcUVStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             const uint8_t* srcUV, int srcUVStride,
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void nv12ToBgra32(const uint8_t* srcY, int srcYStride,
-                  const uint8_t* srcUV, int srcUVStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              const uint8_t* srcUV, int srcUVStride,
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void nv12ToRgba32(const uint8_t* srcY, int srcYStride,
-                  const uint8_t* srcUV, int srcUVStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              const uint8_t* srcUV, int srcUVStride,
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void i420ToBgr24(const uint8_t* srcY, int srcYStride,
-                 const uint8_t* srcU, int srcUStride,
-                 const uint8_t* srcV, int srcVStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             const uint8_t* srcU, int srcUStride,
+                             const uint8_t* srcV, int srcVStride,
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void i420ToRgb24(const uint8_t* srcY, int srcYStride,
-                 const uint8_t* srcU, int srcUStride,
-                 const uint8_t* srcV, int srcVStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             const uint8_t* srcU, int srcUStride,
+                             const uint8_t* srcV, int srcVStride,
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void i420ToBgra32(const uint8_t* srcY, int srcYStride,
-                  const uint8_t* srcU, int srcUStride,
-                  const uint8_t* srcV, int srcVStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              const uint8_t* srcU, int srcUStride,
+                              const uint8_t* srcV, int srcVStride,
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void i420ToRgba32(const uint8_t* srcY, int srcYStride,
-                  const uint8_t* srcU, int srcUStride,
-                  const uint8_t* srcV, int srcVStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              const uint8_t* srcU, int srcUStride,
+                              const uint8_t* srcV, int srcVStride,
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 // YUYV (YUV 4:2:2 packed) conversion functions
 CCAP_EXPORT void yuyvToBgr24(const uint8_t* src, int srcStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void yuyvToRgb24(const uint8_t* src, int srcStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void yuyvToBgra32(const uint8_t* src, int srcStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void yuyvToRgba32(const uint8_t* src, int srcStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 // UYVY (YUV 4:2:2 packed) conversion functions
 CCAP_EXPORT void uyvyToBgr24(const uint8_t* src, int srcStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void uyvyToRgb24(const uint8_t* src, int srcStride,
-                 uint8_t* dst, int dstStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             uint8_t* dst, int dstStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void uyvyToBgra32(const uint8_t* src, int srcStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void uyvyToRgba32(const uint8_t* src, int srcStride,
-                  uint8_t* dst, int dstStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              uint8_t* dst, int dstStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 //////////// rgb color to yuv color /////////////
 //
@@ -375,24 +376,24 @@ CCAP_EXPORT void uyvyToRgba32(const uint8_t* src, int srcStride,
 // without a separate scratch buffer).
 
 CCAP_EXPORT void bgr24ToNv12(const uint8_t* src, int srcStride,
-                 uint8_t* dstY, int dstYStride,
-                 uint8_t* dstUV, int dstUVStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             uint8_t* dstY, int dstYStride,
+                             uint8_t* dstUV, int dstUVStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void rgb24ToNv12(const uint8_t* src, int srcStride,
-                 uint8_t* dstY, int dstYStride,
-                 uint8_t* dstUV, int dstUVStride,
-                 int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                             uint8_t* dstY, int dstYStride,
+                             uint8_t* dstUV, int dstUVStride,
+                             int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void bgra32ToNv12(const uint8_t* src, int srcStride,
-                  uint8_t* dstY, int dstYStride,
-                  uint8_t* dstUV, int dstUVStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              uint8_t* dstY, int dstYStride,
+                              uint8_t* dstUV, int dstUVStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 CCAP_EXPORT void rgba32ToNv12(const uint8_t* src, int srcStride,
-                  uint8_t* dstY, int dstYStride,
-                  uint8_t* dstUV, int dstUVStride,
-                  int width, int height, ConvertFlag flag = ConvertFlag::Default);
+                              uint8_t* dstY, int dstYStride,
+                              uint8_t* dstUV, int dstUVStride,
+                              int width, int height, ConvertFlag flag = ConvertFlag::Default);
 
 class Allocator;
 /// @brief Used to store some intermediate results, avoiding repeated memory allocation.

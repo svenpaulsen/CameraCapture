@@ -668,7 +668,7 @@ bool Provider::open(int deviceIndex, bool autoStart) {
     }
 
     // Auto mode — try DSHOW first, then MSMF.
-    for (auto candidate : {WindowsBackendPreference::DirectShow, WindowsBackendPreference::MSMF}) {
+    for (auto candidate : { WindowsBackendPreference::DirectShow, WindowsBackendPreference::MSMF }) {
         if (candidate == WindowsBackendPreference::MSMF && !isMediaFoundationCameraBackendAvailable()) {
             continue;
         }

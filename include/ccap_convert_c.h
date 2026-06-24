@@ -11,10 +11,10 @@
 #ifndef CCAP_CONVERT_C_H
 #define CCAP_CONVERT_C_H
 
+#include "ccap_config.h"
+
 #include <stdbool.h>
 #include <stdint.h>
-
-#include "ccap_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -168,8 +168,8 @@ CCAP_EXPORT void ccap_convert_yuv_to_rgb_709f(int y, int u, int v, int* r, int* 
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_rgba_to_bgra(const uint8_t* src, int src_stride,
-                               uint8_t* dst, int dst_stride,
-                               int width, int height);
+                                           uint8_t* dst, int dst_stride,
+                                           int width, int height);
 
 /**
  * @brief Convert BGRA to RGBA (swap R and B channels)
@@ -181,8 +181,8 @@ CCAP_EXPORT void ccap_convert_rgba_to_bgra(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_bgra_to_rgba(const uint8_t* src, int src_stride,
-                               uint8_t* dst, int dst_stride,
-                               int width, int height);
+                                           uint8_t* dst, int dst_stride,
+                                           int width, int height);
 
 /**
  * @brief Convert RGBA to BGR (remove alpha, swap R and B channels)
@@ -194,8 +194,8 @@ CCAP_EXPORT void ccap_convert_bgra_to_rgba(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_rgba_to_bgr(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert BGRA to RGB (remove alpha, swap R and B channels)
@@ -207,8 +207,8 @@ CCAP_EXPORT void ccap_convert_rgba_to_bgr(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_bgra_to_rgb(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert RGBA to RGB (remove alpha channel)
@@ -220,8 +220,8 @@ CCAP_EXPORT void ccap_convert_bgra_to_rgb(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_rgba_to_rgb(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert BGRA to BGR (remove alpha channel)
@@ -233,8 +233,8 @@ CCAP_EXPORT void ccap_convert_rgba_to_rgb(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_bgra_to_bgr(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert RGB to BGRA (add alpha=255, swap R and B channels)
@@ -246,8 +246,8 @@ CCAP_EXPORT void ccap_convert_bgra_to_bgr(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_rgb_to_bgra(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert BGR to RGBA (add alpha=255, swap R and B channels)
@@ -259,8 +259,8 @@ CCAP_EXPORT void ccap_convert_rgb_to_bgra(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_bgr_to_rgba(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert RGB to RGBA (add alpha=255)
@@ -272,8 +272,8 @@ CCAP_EXPORT void ccap_convert_bgr_to_rgba(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_rgb_to_rgba(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert BGR to BGRA (add alpha=255)
@@ -285,8 +285,8 @@ CCAP_EXPORT void ccap_convert_rgb_to_rgba(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_bgr_to_bgra(const uint8_t* src, int src_stride,
-                              uint8_t* dst, int dst_stride,
-                              int width, int height);
+                                          uint8_t* dst, int dst_stride,
+                                          int width, int height);
 
 /**
  * @brief Convert RGB to BGR (swap R and B channels)
@@ -298,8 +298,8 @@ CCAP_EXPORT void ccap_convert_bgr_to_bgra(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_rgb_to_bgr(const uint8_t* src, int src_stride,
-                             uint8_t* dst, int dst_stride,
-                             int width, int height);
+                                         uint8_t* dst, int dst_stride,
+                                         int width, int height);
 
 /**
  * @brief Convert BGR to RGB (swap R and B channels)
@@ -311,8 +311,8 @@ CCAP_EXPORT void ccap_convert_rgb_to_bgr(const uint8_t* src, int src_stride,
  * @param height Image height in pixels (negative for vertical flip)
  */
 CCAP_EXPORT void ccap_convert_bgr_to_rgb(const uint8_t* src, int src_stride,
-                             uint8_t* dst, int dst_stride,
-                             int width, int height);
+                                         uint8_t* dst, int dst_stride,
+                                         int width, int height);
 
 /* ========== YUV to RGB Conversions ========== */
 
@@ -329,9 +329,9 @@ CCAP_EXPORT void ccap_convert_bgr_to_rgb(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_nv12_to_bgr24(const uint8_t* src_y, int src_y_stride,
-                                const uint8_t* src_uv, int src_uv_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            const uint8_t* src_uv, int src_uv_stride,
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert NV12 to RGB24
@@ -346,9 +346,9 @@ CCAP_EXPORT void ccap_convert_nv12_to_bgr24(const uint8_t* src_y, int src_y_stri
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_nv12_to_rgb24(const uint8_t* src_y, int src_y_stride,
-                                const uint8_t* src_uv, int src_uv_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            const uint8_t* src_uv, int src_uv_stride,
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert NV12 to BGRA32
@@ -363,9 +363,9 @@ CCAP_EXPORT void ccap_convert_nv12_to_rgb24(const uint8_t* src_y, int src_y_stri
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_nv12_to_bgra32(const uint8_t* src_y, int src_y_stride,
-                                 const uint8_t* src_uv, int src_uv_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             const uint8_t* src_uv, int src_uv_stride,
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert NV12 to RGBA32
@@ -380,9 +380,9 @@ CCAP_EXPORT void ccap_convert_nv12_to_bgra32(const uint8_t* src_y, int src_y_str
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_nv12_to_rgba32(const uint8_t* src_y, int src_y_stride,
-                                 const uint8_t* src_uv, int src_uv_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             const uint8_t* src_uv, int src_uv_stride,
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert I420 to BGR24
@@ -399,10 +399,10 @@ CCAP_EXPORT void ccap_convert_nv12_to_rgba32(const uint8_t* src_y, int src_y_str
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_i420_to_bgr24(const uint8_t* src_y, int src_y_stride,
-                                const uint8_t* src_u, int src_u_stride,
-                                const uint8_t* src_v, int src_v_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            const uint8_t* src_u, int src_u_stride,
+                                            const uint8_t* src_v, int src_v_stride,
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert I420 to RGB24
@@ -419,10 +419,10 @@ CCAP_EXPORT void ccap_convert_i420_to_bgr24(const uint8_t* src_y, int src_y_stri
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_i420_to_rgb24(const uint8_t* src_y, int src_y_stride,
-                                const uint8_t* src_u, int src_u_stride,
-                                const uint8_t* src_v, int src_v_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            const uint8_t* src_u, int src_u_stride,
+                                            const uint8_t* src_v, int src_v_stride,
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert I420 to BGRA32
@@ -439,10 +439,10 @@ CCAP_EXPORT void ccap_convert_i420_to_rgb24(const uint8_t* src_y, int src_y_stri
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_i420_to_bgra32(const uint8_t* src_y, int src_y_stride,
-                                 const uint8_t* src_u, int src_u_stride,
-                                 const uint8_t* src_v, int src_v_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             const uint8_t* src_u, int src_u_stride,
+                                             const uint8_t* src_v, int src_v_stride,
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert I420 to RGBA32
@@ -459,10 +459,10 @@ CCAP_EXPORT void ccap_convert_i420_to_bgra32(const uint8_t* src_y, int src_y_str
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_i420_to_rgba32(const uint8_t* src_y, int src_y_stride,
-                                 const uint8_t* src_u, int src_u_stride,
-                                 const uint8_t* src_v, int src_v_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             const uint8_t* src_u, int src_u_stride,
+                                             const uint8_t* src_v, int src_v_stride,
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 /* ========== YUYV (YUV 4:2:2 packed) Conversions ========== */
 
@@ -477,8 +477,8 @@ CCAP_EXPORT void ccap_convert_i420_to_rgba32(const uint8_t* src_y, int src_y_str
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_yuyv_to_bgr24(const uint8_t* src, int src_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert YUYV to RGB24
@@ -491,8 +491,8 @@ CCAP_EXPORT void ccap_convert_yuyv_to_bgr24(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_yuyv_to_rgb24(const uint8_t* src, int src_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert YUYV to BGRA32
@@ -505,8 +505,8 @@ CCAP_EXPORT void ccap_convert_yuyv_to_rgb24(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_yuyv_to_bgra32(const uint8_t* src, int src_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert YUYV to RGBA32
@@ -519,8 +519,8 @@ CCAP_EXPORT void ccap_convert_yuyv_to_bgra32(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_yuyv_to_rgba32(const uint8_t* src, int src_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 /* ========== UYVY (YUV 4:2:2 packed) Conversions ========== */
 
@@ -535,8 +535,8 @@ CCAP_EXPORT void ccap_convert_yuyv_to_rgba32(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_uyvy_to_bgr24(const uint8_t* src, int src_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert UYVY to RGB24
@@ -549,8 +549,8 @@ CCAP_EXPORT void ccap_convert_uyvy_to_bgr24(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_uyvy_to_rgb24(const uint8_t* src, int src_stride,
-                                uint8_t* dst, int dst_stride,
-                                int width, int height, CcapConvertFlag flag);
+                                            uint8_t* dst, int dst_stride,
+                                            int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert UYVY to BGRA32
@@ -563,8 +563,8 @@ CCAP_EXPORT void ccap_convert_uyvy_to_rgb24(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_uyvy_to_bgra32(const uint8_t* src, int src_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 /**
  * @brief Convert UYVY to RGBA32
@@ -577,8 +577,8 @@ CCAP_EXPORT void ccap_convert_uyvy_to_bgra32(const uint8_t* src, int src_stride,
  * @param flag Conversion flags (color space and range)
  */
 CCAP_EXPORT void ccap_convert_uyvy_to_rgba32(const uint8_t* src, int src_stride,
-                                 uint8_t* dst, int dst_stride,
-                                 int width, int height, CcapConvertFlag flag);
+                                             uint8_t* dst, int dst_stride,
+                                             int width, int height, CcapConvertFlag flag);
 
 #ifdef __cplusplus
 }

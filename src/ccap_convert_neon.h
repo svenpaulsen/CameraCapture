@@ -19,7 +19,7 @@
 // compound literal but MSVC rejects with C2059. Falling back to
 // the portable C path costs some perf on Windows ARM64 but avoids
 // patching ~50 sites in the NEON kernels.
-#if (defined(__aarch64__) || defined(_M_ARM64)) && \
+#if (defined(__aarch64__) || defined(_M_ARM64)) &&                                           \
     (defined(__APPLE__) || defined(_WIN32) || defined(__ANDROID__) || defined(__linux__)) && \
     !defined(_MSC_VER)
 #define ENABLE_NEON_IMP 1

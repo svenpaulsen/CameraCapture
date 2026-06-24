@@ -27,16 +27,16 @@ namespace ccap {
  * @brief Video codec for encoding.
  */
 enum class VideoCodec {
-    H264,  ///< H.264 / AVC (default, best compatibility and performance)
-    HEVC,  ///< H.265 / HEVC (better compression, less compatible)
+    H264, ///< H.264 / AVC (default, best compatibility and performance)
+    HEVC, ///< H.265 / HEVC (better compression, less compatible)
 };
 
 /**
  * @brief Video container format.
  */
 enum class VideoFormat {
-    MP4,   ///< MP4 container
-    MOV,   ///< MOV container
+    MP4, ///< MP4 container
+    MOV, ///< MOV container
 };
 
 /**
@@ -45,10 +45,10 @@ enum class VideoFormat {
 struct WriterConfig {
     VideoCodec codec = VideoCodec::H264; ///< Default codec; auto-fallback to HEVC if H.264 is unavailable
     VideoFormat container = VideoFormat::MP4;
-    uint32_t width = 0;          ///< Frame width in pixels
-    uint32_t height = 0;         ///< Frame height in pixels
-    double frameRate = 30.0;     ///< Target frame rate (default 30fps; used for timestamp generation when timestampNs is 0)
-    uint64_t bitRate = 0;        ///< Target bit rate in bits/s; 0 = auto (YouTube official recommended bitrates)
+    uint32_t width = 0;      ///< Frame width in pixels
+    uint32_t height = 0;     ///< Frame height in pixels
+    double frameRate = 30.0; ///< Target frame rate (default 30fps; used for timestamp generation when timestampNs is 0)
+    uint64_t bitRate = 0;    ///< Target bit rate in bits/s; 0 = auto (YouTube official recommended bitrates)
 };
 
 /**
@@ -70,7 +70,7 @@ public:
      * @brief Open writer to a file path.
      * @param filePath Output file path (e.g., "output.mp4")
      * @param config Writer configuration (width, height, codec, etc.)
-        * @note Call `close()` before reopening an existing writer instance.
+     * @note Call `close()` before reopening an existing writer instance.
      * @return true on success, false on failure.
      */
     bool open(std::string_view filePath, const WriterConfig& config);

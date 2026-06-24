@@ -27,8 +27,8 @@ typedef struct CcapVideoWriter CcapVideoWriter;
 
 /** @brief Video codec enumeration */
 typedef enum {
-    CCAP_VIDEO_CODEC_H264 = 0,  ///< H.264 / AVC (default, best compatibility)
-    CCAP_VIDEO_CODEC_HEVC = 1,  ///< H.265 / HEVC (better compression, less compatible)
+    CCAP_VIDEO_CODEC_H264 = 0, ///< H.264 / AVC (default, best compatibility)
+    CCAP_VIDEO_CODEC_HEVC = 1, ///< H.265 / HEVC (better compression, less compatible)
 } CcapVideoCodec;
 
 /** @brief Video container format */
@@ -45,12 +45,12 @@ typedef enum {
  *       `width` and `height` must still be set before opening a writer.
  */
 typedef struct {
-    CcapVideoCodec codec;          ///< Preferred codec
-    CcapVideoFormat container;     ///< Container format
-    uint32_t width;                ///< Frame width
-    uint32_t height;               ///< Frame height
-    double frameRate;              ///< Target frame rate; 0 lets open() normalize to 30fps
-    uint64_t bitRate;              ///< Target bit rate in bits/s (0 = auto, YouTube recommended bitrates)
+    CcapVideoCodec codec;      ///< Preferred codec
+    CcapVideoFormat container; ///< Container format
+    uint32_t width;            ///< Frame width
+    uint32_t height;           ///< Frame height
+    double frameRate;          ///< Target frame rate; 0 lets open() normalize to 30fps
+    uint64_t bitRate;          ///< Target bit rate in bits/s (0 = auto, YouTube recommended bitrates)
 } CcapWriterConfig;
 
 /**

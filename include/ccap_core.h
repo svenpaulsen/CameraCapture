@@ -3,7 +3,7 @@
  * @author wysaid (this@wysaid.org)
  * @brief Header file for CameraCapture class.
  * @date 2025-04
- * 
+ *
  * @note For C language, use ccap_c.h instead of this header.
  *
  */
@@ -62,24 +62,24 @@ public:
     ///        You can use the `open` method to open a camera device later.
     Provider();
 
-     /**
-      * @brief Construct a new Provider object, and open the camera device.
-      * @param deviceName The name of the device to open. @see #open
-      * @param extraInfo Optional backend hint.
-      *        On Windows, accepted values include `auto`, `msmf`, `dshow`, and `backend=<value>`.
-    *        `auto` enumerates both Windows backends and routes each device to a compatible backend automatically.
-      *        Other platforms ignore this parameter.
-      */
+    /**
+     * @brief Construct a new Provider object, and open the camera device.
+     * @param deviceName The name of the device to open. @see #open
+     * @param extraInfo Optional backend hint.
+     *        On Windows, accepted values include `auto`, `msmf`, `dshow`, and `backend=<value>`.
+     *        `auto` enumerates both Windows backends and routes each device to a compatible backend automatically.
+     *        Other platforms ignore this parameter.
+     */
     explicit Provider(std::string_view deviceName, std::string_view extraInfo = "");
 
-     /**
-      * @brief Construct a new Provider object, and open the camera device.
-      * @param deviceIndex The index of the device to open. @see #open
-      * @param extraInfo Optional backend hint.
-      *        On Windows, accepted values include `auto`, `msmf`, `dshow`, and `backend=<value>`.
-    *        `auto` enumerates both Windows backends and routes each device to a compatible backend automatically.
-      *        Other platforms ignore this parameter.
-      */
+    /**
+     * @brief Construct a new Provider object, and open the camera device.
+     * @param deviceIndex The index of the device to open. @see #open
+     * @param extraInfo Optional backend hint.
+     *        On Windows, accepted values include `auto`, `msmf`, `dshow`, and `backend=<value>`.
+     *        `auto` enumerates both Windows backends and routes each device to a compatible backend automatically.
+     *        Other platforms ignore this parameter.
+     */
     explicit Provider(int deviceIndex, std::string_view extraInfo = "");
 
     /**
@@ -227,8 +227,6 @@ public:
      *     The default value is DEFAULT_MAX_CACHE_FRAME_SIZE (15).
      */
     void setMaxCacheFrameSize(uint32_t size);
-
-
 
     // ↓ This part is not relevant to the user ↓
     Provider(Provider&&) noexcept;

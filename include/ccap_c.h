@@ -3,7 +3,7 @@
  * @author wysaid (this@wysaid.org)
  * @brief Pure C interface header file for ccap, supports calling from pure C language.
  * @date 2025-05
- * 
+ *
  * @note For additional utility functions in C, also include:
  *       - ccap_convert_c.h (pixel conversion functions)
  *       - ccap_utils_c.h (file I/O and string utilities)
@@ -14,11 +14,11 @@
 #ifndef CCAP_C_H
 #define CCAP_C_H
 
-#include <stdint.h>
+#include "ccap_config.h"
+
 #include <stdbool.h>
 #include <stddef.h>
-
-#include "ccap_config.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,31 +75,31 @@ typedef enum {
 
 /** @brief Error codes for camera capture operations */
 typedef enum {
-    CCAP_ERROR_NONE = 0,                        /**< No error occurred */
-    CCAP_ERROR_NO_DEVICE_FOUND = 0x1001,       /**< No camera device found or device discovery failed */
-    CCAP_ERROR_INVALID_DEVICE = 0x1002,        /**< Invalid device name or device index */
-    CCAP_ERROR_DEVICE_OPEN_FAILED = 0x1003,    /**< Camera device open failed */
-    CCAP_ERROR_DEVICE_START_FAILED = 0x1004,   /**< Camera start failed */
-    CCAP_ERROR_DEVICE_STOP_FAILED = 0x1005,    /**< Camera stop failed */
-    CCAP_ERROR_INITIALIZATION_FAILED = 0x1006, /**< Initialization failed */
-    CCAP_ERROR_UNSUPPORTED_RESOLUTION = 0x2001, /**< Requested resolution is not supported */
+    CCAP_ERROR_NONE = 0,                          /**< No error occurred */
+    CCAP_ERROR_NO_DEVICE_FOUND = 0x1001,          /**< No camera device found or device discovery failed */
+    CCAP_ERROR_INVALID_DEVICE = 0x1002,           /**< Invalid device name or device index */
+    CCAP_ERROR_DEVICE_OPEN_FAILED = 0x1003,       /**< Camera device open failed */
+    CCAP_ERROR_DEVICE_START_FAILED = 0x1004,      /**< Camera start failed */
+    CCAP_ERROR_DEVICE_STOP_FAILED = 0x1005,       /**< Camera stop failed */
+    CCAP_ERROR_INITIALIZATION_FAILED = 0x1006,    /**< Initialization failed */
+    CCAP_ERROR_UNSUPPORTED_RESOLUTION = 0x2001,   /**< Requested resolution is not supported */
     CCAP_ERROR_UNSUPPORTED_PIXEL_FORMAT = 0x2002, /**< Requested pixel format is not supported */
-    CCAP_ERROR_FRAME_RATE_SET_FAILED = 0x2003,  /**< Frame rate setting failed */
-    CCAP_ERROR_PROPERTY_SET_FAILED = 0x2004,    /**< Property setting failed */
-    CCAP_ERROR_FRAME_CAPTURE_TIMEOUT = 0x3001, /**< Frame capture timeout */
-    CCAP_ERROR_FRAME_CAPTURE_FAILED = 0x3002,  /**< Frame capture failed */
+    CCAP_ERROR_FRAME_RATE_SET_FAILED = 0x2003,    /**< Frame rate setting failed */
+    CCAP_ERROR_PROPERTY_SET_FAILED = 0x2004,      /**< Property setting failed */
+    CCAP_ERROR_FRAME_CAPTURE_TIMEOUT = 0x3001,    /**< Frame capture timeout */
+    CCAP_ERROR_FRAME_CAPTURE_FAILED = 0x3002,     /**< Frame capture failed */
     CCAP_ERROR_MEMORY_ALLOCATION_FAILED = 0x4001, /**< Memory allocation failed */
     /* File playback error codes */
-    CCAP_ERROR_FILE_OPEN_FAILED = 0x5001,      /**< Failed to open video file */
+    CCAP_ERROR_FILE_OPEN_FAILED = 0x5001,         /**< Failed to open video file */
     CCAP_ERROR_UNSUPPORTED_VIDEO_FORMAT = 0x5002, /**< Video format is not supported */
-    CCAP_ERROR_SEEK_FAILED = 0x5003,           /**< Seek operation failed */
+    CCAP_ERROR_SEEK_FAILED = 0x5003,              /**< Seek operation failed */
     /* Video writer error codes */
-    CCAP_ERROR_WRITER_OPEN_FAILED = 0x6001,    /**< Failed to open video writer */
-    CCAP_ERROR_WRITER_WRITE_FAILED = 0x6002,   /**< Failed to write frame */
-    CCAP_ERROR_WRITER_CLOSE_FAILED = 0x6003,   /**< Failed to finalize file */
-    CCAP_ERROR_WRITER_NOT_OPENED = 0x6004,     /**< Writer not opened */
-    CCAP_ERROR_UNSUPPORTED_CODEC = 0x6005,     /**< Codec not supported on this platform */
-    CCAP_ERROR_INTERNAL_ERROR = 0x9999,        /**< Unknown or internal error */
+    CCAP_ERROR_WRITER_OPEN_FAILED = 0x6001,  /**< Failed to open video writer */
+    CCAP_ERROR_WRITER_WRITE_FAILED = 0x6002, /**< Failed to write frame */
+    CCAP_ERROR_WRITER_CLOSE_FAILED = 0x6003, /**< Failed to finalize file */
+    CCAP_ERROR_WRITER_NOT_OPENED = 0x6004,   /**< Writer not opened */
+    CCAP_ERROR_UNSUPPORTED_CODEC = 0x6005,   /**< Codec not supported on this platform */
+    CCAP_ERROR_INTERNAL_ERROR = 0x9999,      /**< Unknown or internal error */
 } CcapErrorCode;
 
 /** @brief Error callback function type for C interface */
@@ -111,16 +111,16 @@ typedef void (*CcapErrorCallback)(CcapErrorCode errorCode, const char* errorDesc
 
 /** @brief Video frame data structure for C interface */
 typedef struct {
-    uint8_t* data[3];                   /**< Pointers to frame data planes */
-    uint32_t stride[3];                 /**< Stride (bytes per row) for each plane */
-    CcapPixelFormat pixelFormat;        /**< Pixel format of the frame */
-    uint32_t width;                     /**< Frame width in pixels */
-    uint32_t height;                    /**< Frame height in pixels */
-    uint32_t sizeInBytes;               /**< Total size of frame data in bytes */
-    uint64_t timestamp;                 /**< Frame timestamp in nanoseconds */
-    uint64_t frameIndex;                /**< Unique, incremental frame index */
-    CcapFrameOrientation orientation;   /**< Frame orientation */
-    void* nativeHandle;                 /**< Platform-specific native handle */
+    uint8_t* data[3];                 /**< Pointers to frame data planes */
+    uint32_t stride[3];               /**< Stride (bytes per row) for each plane */
+    CcapPixelFormat pixelFormat;      /**< Pixel format of the frame */
+    uint32_t width;                   /**< Frame width in pixels */
+    uint32_t height;                  /**< Frame height in pixels */
+    uint32_t sizeInBytes;             /**< Total size of frame data in bytes */
+    uint64_t timestamp;               /**< Frame timestamp in nanoseconds */
+    uint64_t frameIndex;              /**< Unique, incremental frame index */
+    CcapFrameOrientation orientation; /**< Frame orientation */
+    void* nativeHandle;               /**< Platform-specific native handle */
 } CcapVideoFrameInfo;
 
 /** @brief Resolution structure */
@@ -137,11 +137,11 @@ typedef struct {
 
 /** @brief Device information structure */
 typedef struct {
-    char deviceName[CCAP_MAX_DEVICE_NAME_LENGTH];      /**< Device name */
+    char deviceName[CCAP_MAX_DEVICE_NAME_LENGTH];                  /**< Device name */
     CcapPixelFormat supportedPixelFormats[CCAP_MAX_PIXEL_FORMATS]; /**< Array of supported pixel formats */
-    size_t pixelFormatCount;                           /**< Number of supported pixel formats */
-    CcapResolution supportedResolutions[CCAP_MAX_RESOLUTIONS];   /**< Array of supported resolutions */
-    size_t resolutionCount;                            /**< Number of supported resolutions */
+    size_t pixelFormatCount;                                       /**< Number of supported pixel formats */
+    CcapResolution supportedResolutions[CCAP_MAX_RESOLUTIONS];     /**< Array of supported resolutions */
+    size_t resolutionCount;                                        /**< Number of supported resolutions */
 } CcapDeviceInfo;
 
 /** @brief Callback function type for new frame notifications */
@@ -333,8 +333,6 @@ CCAP_EXPORT void ccap_provider_set_max_available_frame_size(CcapProvider* provid
  * @param size Maximum number of cached frames
  */
 CCAP_EXPORT void ccap_provider_set_max_cache_frame_size(CcapProvider* provider, uint32_t size);
-
-
 
 /* ========== Error Callback ========== */
 

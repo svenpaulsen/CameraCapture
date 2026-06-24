@@ -12,8 +12,9 @@
 #define CCAP_UTILS_C_H
 
 #include "ccap_c.h"
-#include <stdint.h>
+
 #include <stdbool.h>
+#include <stdint.h>
 
 // CCAP_EXPORT is defined in ccap_config.h (included by ccap_c.h)
 
@@ -46,8 +47,8 @@ CCAP_EXPORT int ccap_pixel_format_to_string(CcapPixelFormat format, char* buffer
  *       YUV formats will be saved as .yuv files, RGB formats as .bmp files
  *       This function is for debugging purposes and not performance optimized
  */
-CCAP_EXPORT int ccap_dump_frame_to_file(const CcapVideoFrame* frame, const char* filename_no_suffix, 
-                            char* output_path, size_t output_path_size);
+CCAP_EXPORT int ccap_dump_frame_to_file(const CcapVideoFrame* frame, const char* filename_no_suffix,
+                                        char* output_path, size_t output_path_size);
 
 /**
  * @brief Save a video frame to directory with auto-generated filename
@@ -61,7 +62,7 @@ CCAP_EXPORT int ccap_dump_frame_to_file(const CcapVideoFrame* frame, const char*
  *       This function is for debugging purposes and not performance optimized
  */
 CCAP_EXPORT int ccap_dump_frame_to_directory(const CcapVideoFrame* frame, const char* directory,
-                                 char* output_path, size_t output_path_size);
+                                             char* output_path, size_t output_path_size);
 
 /**
  * @brief Save RGB data as BMP file
@@ -75,9 +76,9 @@ CCAP_EXPORT int ccap_dump_frame_to_directory(const CcapVideoFrame* frame, const 
  * @param is_top_to_bottom true if data is top-to-bottom, false for bottom-to-top
  * @return true on success, false on failure
  */
-CCAP_EXPORT bool ccap_save_rgb_data_as_bmp(const char* filename, const unsigned char* data, 
-                               uint32_t width, uint32_t line_offset, uint32_t height,
-                               bool is_bgr, bool has_alpha, bool is_top_to_bottom);
+CCAP_EXPORT bool ccap_save_rgb_data_as_bmp(const char* filename, const unsigned char* data,
+                                           uint32_t width, uint32_t line_offset, uint32_t height,
+                                           bool is_bgr, bool has_alpha, bool is_top_to_bottom);
 
 /* ========== Logging Utilities ========== */
 
@@ -85,11 +86,11 @@ CCAP_EXPORT bool ccap_save_rgb_data_as_bmp(const char* filename, const unsigned 
  * @brief Log level enumeration for C interface
  */
 typedef enum {
-    CCAP_LOG_LEVEL_NONE = 0,              /**< No log output */
-    CCAP_LOG_LEVEL_ERROR = 1,             /**< Error log level */
-    CCAP_LOG_LEVEL_WARNING = 3,           /**< Warning log level (Error | Warning) */
-    CCAP_LOG_LEVEL_INFO = 7,              /**< Info log level (Error | Warning | Info) */
-    CCAP_LOG_LEVEL_VERBOSE = 15           /**< Verbose log level (Error | Warning | Info | Verbose) */
+    CCAP_LOG_LEVEL_NONE = 0,    /**< No log output */
+    CCAP_LOG_LEVEL_ERROR = 1,   /**< Error log level */
+    CCAP_LOG_LEVEL_WARNING = 3, /**< Warning log level (Error | Warning) */
+    CCAP_LOG_LEVEL_INFO = 7,    /**< Info log level (Error | Warning | Info) */
+    CCAP_LOG_LEVEL_VERBOSE = 15 /**< Verbose log level (Error | Warning | Info | Verbose) */
 } CcapLogLevel;
 
 /**

@@ -17,18 +17,15 @@
 
 /// header only, to convert ccap::Frame to cv::Mat
 
-namespace ccap
-{
+namespace ccap {
 /**
  * @brief Converts a Frame in RGB/BGR/RGBA/BGRA image format to cv::Mat. Does not change channel order and does not support YUV format.
  * @param frame
  * @param mat
  * @note Note: This function does not copy data. The lifetime of the Frame must be maintained.
  */
-inline cv::Mat convertRgbFrameToMat(const VideoFrame& frame)
-{
-    if (!((uint32_t)frame.pixelFormat & (uint32_t)kPixelFormatRGBColorBit))
-    {
+inline cv::Mat convertRgbFrameToMat(const VideoFrame& frame) {
+    if (!((uint32_t)frame.pixelFormat & (uint32_t)kPixelFormatRGBColorBit)) {
         return {};
     }
 
