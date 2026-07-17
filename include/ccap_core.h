@@ -107,6 +107,24 @@ public:
     std::vector<DeviceIdentity> findDeviceIdentities();
 
     /**
+     * @brief Like findDeviceIdentities(), but backend-explicit and without a
+     *        Provider instance. Never opens any device.
+     * @param extraInfo Backend selector, same values the constructors accept.
+     *        On Windows, `msmf` enumerates the Media Foundation backend (id =
+     *        symbolic link), `dshow` the DirectShow backend (id = DevicePath);
+     *        empty/`auto` resolves via `CCAP_WINDOWS_BACKEND` as usual. Other
+     *        platforms ignore this parameter.
+     * @return A list of {name, id} entries in the backend's enumeration order,
+     *         so each index matches `Provider(int deviceIndex, extraInfo)` with
+     *         the same `extraInfo`. Empty when the backend is unavailable.
+     * @note The MSMF symbolic link and the DirectShow DevicePath describe the
+     *       same device-interface path but differ in the trailing interface-class
+     *       GUID and character case — match ids across backends by comparing
+     *       case-insensitively up to the "#{" of the GUID suffix.
+     */
+    static std::vector<DeviceIdentity> findDeviceIdentitiesForBackend(std::string_view extraInfo);
+
+    /**
      * @brief Opens a capture device.
      *
      * @param deviceName The name of the device to open. The format is platform-dependent. Pass an empty string to use the default device.

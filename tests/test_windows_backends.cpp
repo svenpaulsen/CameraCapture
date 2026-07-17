@@ -10,28 +10,26 @@
 #define NOMINMAX
 #endif
 
-#include <windows.h>
-
 #include "test_utils.h"
-
-#include <ccap.h>
 
 #include <algorithm>
 #include <array>
+#include <ccap.h>
 #include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
+#include <gtest/gtest.h>
 #include <limits>
 #include <optional>
 #include <set>
 #include <sstream>
-#include <thread>
-#include <gtest/gtest.h>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
+#include <windows.h>
 
 namespace fs = std::filesystem;
 
@@ -564,6 +562,77 @@ TEST(WindowsBackendsTest, MSMFFramesMatchDirectShowWithinTolerance) {
     EXPECT_GE(bestStats->psnr, 20.0) << formatDiffStats(*bestStats);
     EXPECT_LE(bestStats->meanAbsDiff, 12.0) << formatDiffStats(*bestStats);
     EXPECT_GE(bestStats->withinToleranceRatio, 0.80) << formatDiffStats(*bestStats);
+}
+
+namespace {
+
+// Cross-backend id matching as documented on findDeviceIdentitiesForBackend:
+// the DirectShow DevicePath and the MSMF symbolic link name the same
+// device-interface path but differ in the trailing interface-class GUID and
+// character case — compare case-insensitively up to the "#{" of the GUID.
+std::string normalizeInterfacePath(std::string_view id) {
+    std::string normalized;
+    normalized.reserve(id.size());
+    for (char ch : id) {
+        normalized.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+    }
+
+    const size_t guidPos = normalized.find("#{");
+    if (guidPos != std::string::npos) {
+        normalized.erase(guidPos);
+    }
+    return normalized;
+}
+
+} // namespace
+
+TEST(WindowsBackendsTest, BackendExplicitIdentitiesMatchBackendNames) {
+    for (const char* backend : { "dshow", "msmf" }) {
+        SCOPED_TRACE(backend);
+        auto identities = ccap::Provider::findDeviceIdentitiesForBackend(backend);
+        auto deviceNames = listDevicesForBackend(backend);
+
+        // Same devices as the name enumeration; order may differ between the
+        // two calls on DirectShow (identities are raw enumeration order,
+        // names are display-sorted), so compare as multisets.
+        std::multiset<std::string> identityNames;
+        for (const auto& identity : identities) {
+            identityNames.insert(identity.name);
+        }
+        EXPECT_EQ(identityNames, std::multiset<std::string>(deviceNames.begin(), deviceNames.end()));
+    }
+}
+
+TEST(WindowsBackendsTest, MediaFoundationIdentitiesCarrySymbolicLinks) {
+    auto identities = ccap::Provider::findDeviceIdentitiesForBackend("msmf");
+    if (identities.empty()) {
+        GTEST_SKIP() << "No Media Foundation capture device present";
+    }
+
+    for (const auto& identity : identities) {
+        EXPECT_FALSE(identity.id.empty()) << identity.name;
+    }
+}
+
+TEST(WindowsBackendsTest, IdentitiesMatchAcrossBackendsByInterfacePathStem) {
+    auto msmfIdentities = ccap::Provider::findDeviceIdentitiesForBackend("msmf");
+    if (msmfIdentities.empty()) {
+        GTEST_SKIP() << "No Media Foundation capture device present";
+    }
+
+    auto dshowIdentities = ccap::Provider::findDeviceIdentitiesForBackend("dshow");
+
+    // Every MF-visible device is a physical cam and must also appear in the
+    // DirectShow enumeration with the same interface-path stem — this is the
+    // property callers rely on to resolve a stored DevicePath into the MSMF
+    // index space. Virtual cams (empty DirectShow id) stay out of the match.
+    for (const auto& msmfIdentity : msmfIdentities) {
+        const std::string stem = normalizeInterfacePath(msmfIdentity.id);
+        const auto matches = std::count_if(dshowIdentities.begin(), dshowIdentities.end(), [&](const ccap::DeviceIdentity& dshowIdentity) {
+            return !dshowIdentity.id.empty() && normalizeInterfacePath(dshowIdentity.id) == stem;
+        });
+        EXPECT_EQ(matches, 1) << msmfIdentity.name << " (" << msmfIdentity.id << ")";
+    }
 }
 
 #endif

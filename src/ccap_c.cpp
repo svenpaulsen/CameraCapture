@@ -168,6 +168,33 @@ bool ccap_provider_find_device_identities(CcapProvider* provider, CcapDeviceIden
     return true;
 }
 
+bool ccap_find_device_identities_for_backend(const char* extraInfo, CcapDeviceIdentityList* deviceList) {
+    if (!deviceList) return false;
+
+    std::string_view extraInfoView = extraInfo ? extraInfo : "";
+    auto identities = ccap::Provider::findDeviceIdentitiesForBackend(extraInfoView);
+
+    // Initialize structure
+    memset(deviceList, 0, sizeof(CcapDeviceIdentityList));
+
+    deviceList->deviceCount = identities.size();
+    if (deviceList->deviceCount > CCAP_MAX_DEVICES) {
+        deviceList->deviceCount = CCAP_MAX_DEVICES;
+    }
+
+    for (size_t i = 0; i < deviceList->deviceCount; ++i) {
+        const size_t nameLen = std::min(identities[i].name.size(), (size_t)(CCAP_MAX_DEVICE_NAME_LENGTH - 1));
+        std::copy_n(identities[i].name.data(), nameLen, deviceList->devices[i].deviceName);
+        deviceList->devices[i].deviceName[nameLen] = '\0';
+
+        const size_t idLen = std::min(identities[i].id.size(), (size_t)(CCAP_MAX_DEVICE_ID_LENGTH - 1));
+        std::copy_n(identities[i].id.data(), idLen, deviceList->devices[i].deviceId);
+        deviceList->devices[i].deviceId[idLen] = '\0';
+    }
+
+    return true;
+}
+
 /* ========== Device Management ========== */
 
 bool ccap_provider_open(CcapProvider* provider, const char* deviceName, bool autoStart) {

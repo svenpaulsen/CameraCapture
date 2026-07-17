@@ -464,6 +464,41 @@ impl Provider {
             return Ok(Vec::new());
         }
 
+        Ok(Self::identity_list_to_vec(&list))
+    }
+
+    /// Like `find_device_identities()`, but backend-explicit and without a
+    /// `Provider` instance. Never opens any device.
+    ///
+    /// On Windows, `extra_info` selects the backend with the same values the
+    /// constructors accept (`"msmf"`, `"dshow"`, `"auto"`, `"backend=<value>"`).
+    /// `"msmf"` yields Media Foundation symbolic links as ids, `"dshow"`
+    /// DirectShow DevicePaths — the same device-interface path, but differing in
+    /// the trailing interface-class GUID and character case. Devices are
+    /// returned in the backend's enumeration order, so each index matches
+    /// `with_device_and_extra_info` with the same `extra_info`. Returns an empty
+    /// list when the backend is unavailable.
+    pub fn find_device_identities_for_backend(
+        extra_info: Option<&str>,
+    ) -> Result<Vec<DeviceIdentity>> {
+        let extra_info = optional_c_string(extra_info, "extra info")?;
+        let mut list = sys::CcapDeviceIdentityList::default();
+        let success = unsafe {
+            sys::ccap_find_device_identities_for_backend(
+                extra_info
+                    .as_ref()
+                    .map_or(ptr::null(), |value| value.as_ptr()),
+                &mut list,
+            )
+        };
+        if !success {
+            return Ok(Vec::new());
+        }
+
+        Ok(Self::identity_list_to_vec(&list))
+    }
+
+    fn identity_list_to_vec(list: &sys::CcapDeviceIdentityList) -> Vec<DeviceIdentity> {
         let mut out = Vec::new();
         for i in 0..list.deviceCount {
             let dev = &list.devices[i];
@@ -479,7 +514,7 @@ impl Provider {
             };
             out.push(DeviceIdentity { name, id });
         }
-        Ok(out)
+        out
     }
 
     /// Get current resolution (convenience getter)

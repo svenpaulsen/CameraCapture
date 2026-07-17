@@ -30,6 +30,7 @@ public:
     ~ProviderMSMF() override;
 
     std::vector<std::string> findDeviceNames() override;
+    std::vector<DeviceIdentity> findDeviceIdentities() override;
     bool open(std::string_view deviceName) override;
     bool isOpened() const override;
     std::optional<DeviceInfo> getDeviceInfo() const override;

@@ -218,6 +218,22 @@ CCAP_EXPORT bool ccap_provider_find_device_names_list(CcapProvider* provider, Cc
  */
 CCAP_EXPORT bool ccap_provider_find_device_identities(CcapProvider* provider, CcapDeviceIdentityList* deviceList);
 
+/**
+ * @brief Like ccap_provider_find_device_identities, but backend-explicit and
+ *        without a provider instance. Never opens any device.
+ * @param extraInfo Backend selector, same values the create functions accept
+ *        (Windows: "msmf", "dshow", "auto", "backend=<value>"; may be NULL).
+ *        On Windows "msmf" yields Media Foundation symbolic links as ids,
+ *        "dshow" DirectShow DevicePaths. Other platforms ignore this parameter.
+ * @param deviceList Output parameter for the device identity list
+ * @return true on success, false on failure
+ * @note Devices are returned in the backend's enumeration order, so the array
+ *       index matches ccap_provider_create_with_index with the same extraInfo.
+ *       The MSMF and DirectShow ids describe the same device-interface path but
+ *       differ in the trailing interface-class GUID and character case.
+ */
+CCAP_EXPORT bool ccap_find_device_identities_for_backend(const char* extraInfo, CcapDeviceIdentityList* deviceList);
+
 /* ========== Device Management ========== */
 
 /**

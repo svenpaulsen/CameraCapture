@@ -290,6 +290,26 @@ std::vector<std::string> ProviderMSMF::findDeviceNames() {
     return deviceNames;
 }
 
+std::vector<DeviceIdentity> ProviderMSMF::findDeviceIdentities() {
+    if (!ensureDeviceCache()) {
+        return {};
+    }
+
+    // Same cache — and therefore the same order — findDeviceNames() and
+    // openByIndex() use, so identity indices line up with open-by-index.
+    // The symbolic link is Media Foundation's stable per-device id: the
+    // same device-interface path DirectShow reports as DevicePath, modulo
+    // the trailing interface-class GUID and character case. Callers that
+    // match ids across backends should compare case-insensitively and
+    // stop at the "#{" of the GUID suffix.
+    std::vector<DeviceIdentity> identities;
+    identities.reserve(m_devices.size());
+    for (const DeviceEntry& entry : m_devices) {
+        identities.push_back(DeviceIdentity{ entry.friendlyName, wideToUtf8(entry.symbolicLink.c_str()) });
+    }
+    return identities;
+}
+
 bool ProviderMSMF::createMediaSource(const std::wstring& symbolicLink) {
     IMFAttributes* attributes = nullptr;
     HRESULT hr = MFCreateAttributes(&attributes, 2);

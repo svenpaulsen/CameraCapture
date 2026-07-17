@@ -55,3 +55,7 @@ path = "examples/capture_grab.rs"
 [[example]]
 name = "capture_callback"
 path = "examples/capture_callback.rs"
+
+[[example]]
+name = "backend_identities"
+path = "examples/backend_identities.rs"
